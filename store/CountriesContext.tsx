@@ -1,9 +1,14 @@
-import { createContext, ReactChildren, useEffect, useState } from 'react';
+import {
+	createContext,
+	ReactChildren,
+	ReactNode,
+	useEffect,
+	useState,
+} from 'react';
 import { Alpha3Code, ICountry } from '../interfaces/ICountry';
 
 interface ICountriesContextProps {
-	children: ReactChildren;
-	countries: ICountry[];
+	children: JSX.Element[] | JSX.Element;
 }
 
 export const CountriesContext = createContext({
@@ -32,10 +37,10 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 
 		if (selected) {
 			setSelectedCountry(selected);
+		} else {
+			throw new Error(`country ${code} not found!`);
 		}
 	}
-
-	// useEffect(() => {},[])
 
 	const context = {
 		countries,
@@ -43,6 +48,10 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 		selectCountry: selectCountryHandler,
 		fetchCountries: fetchCountriesHandler,
 	};
+
+	useEffect(() => {
+		fetchCountriesHandler();
+	}, []);
 
 	return (
 		<CountriesContext.Provider value={context}>
