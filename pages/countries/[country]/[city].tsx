@@ -5,7 +5,9 @@ export default function CityPage() {
 
 	return (
 		<div>
-			<h1>City Page {router.query.city}</h1>
+			<h1>
+				City Page {router.query.country + ' - ' + router.query.city}
+			</h1>
 		</div>
 	);
 }
