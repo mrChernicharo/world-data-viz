@@ -56,7 +56,7 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 
 		const response: IRegionResponse = await req.json();
 
-		console.log(response.data);
+		console.log(response.data, response.metadata);
 	}
 
 	function selectCountryHandler(country: ICountry) {
@@ -82,6 +82,7 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 	}, []);
 
 	useEffect(() => {
+		console.log('fetching regions');
 		fetchRegionsHandler(selectedCountry);
 	}, [selectedCountry]);
 

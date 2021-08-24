@@ -15,11 +15,11 @@
 		"jsx": "preserve"
 	},
 	"include": [
-		"components/shared/Card/CardContainer.js",
+		"src/components/shared/Card/CardContainer.js",
 		"next-env.d.ts",
 		"**/*.ts",
 		"**/*.tsx",
-		"components/shared/Form/FormContainer.js"
+		"src/components/shared/Form/FormContainer.js"
 	],
 	"exclude": ["node_modules"]
 }
