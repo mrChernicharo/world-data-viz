@@ -1,27 +1,33 @@
 import { useRouter } from 'next/router';
 import { parseCountryName } from '../../lib/helpers/helperFns';
 import { ICountry } from '../../lib/interfaces/ICountry';
-import Card from '../shared/Card/Card';
+import { CountryCardContainer } from './CountryCardContainer';
+import { FaUser } from 'react-icons/fa';
 
 interface ICountryCardProps {
 	country: ICountry;
+	onCountryClicked: (country: ICountry) => ICountry;
 }
-export default function CountryCard({ country }: ICountryCardProps) {
+export default function CountryCard({
+	country,
+	onCountryClicked,
+}: ICountryCardProps) {
 	const router = useRouter();
 	const countryName = parseCountryName(country.name);
 
-	function navigateToCountry() {
-		const path = `/countries/${countryName}`;
-
-		router.push(path);
+	function onCardClick(country: ICountry) {
+		onCountryClicked(country);
 	}
 
 	return (
-		<Card>
-			<div onClick={navigateToCountry}>
+		<CountryCardContainer onClick={() => onCardClick(country)}>
+			<div>
 				<h2>{countryName}</h2>
-				<p>{country.population}</p>
+				<p>
+					<FaUser />
+					{country.population}
+				</p>
 			</div>
-		</Card>
+		</CountryCardContainer>
 	);
 }
