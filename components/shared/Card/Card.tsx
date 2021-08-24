@@ -1,7 +1,10 @@
-export default function Card() {
-	return (
-		<div>
-			<h1>Card</h1>
-		</div>
-	);
+import { ReactChildren } from 'react';
+import { CardContainer } from './CardContainer';
+
+interface ICardProps {
+	children: any;
+}
+
+export default function Card({ children }: ICardProps) {
+	return <CardContainer>{children}</CardContainer>;
 }

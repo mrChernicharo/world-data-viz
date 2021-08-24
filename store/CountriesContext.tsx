@@ -5,7 +5,7 @@ import {
 	useEffect,
 	useState,
 } from 'react';
-import { Alpha3Code, ICountry } from '../interfaces/ICountry';
+import { Alpha3Code, ICountry } from '../lib/interfaces/ICountry';
 
 interface ICountriesContextProps {
 	children: JSX.Element[] | JSX.Element;

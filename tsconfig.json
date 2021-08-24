@@ -14,7 +14,7 @@
 		"isolatedModules": true,
 		"jsx": "preserve"
 	},
-	"include": [
+	"include": [, "components/shared/Card/CardContainer.js"
 		"next-env.d.ts",
 		"**/*.ts",
 		"**/*.tsx",
