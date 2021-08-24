@@ -1,6 +1,6 @@
-import { ICountry } from '../../lib/interfaces/ICountry';
+import { ICountry } from '../../../lib/interfaces/ICountry';
 import { CountriesListContainer } from './CountriesListContainer';
-import CountryCard from './CountryCard';
+import CountryCard from '../CountryCard/CountryCard';
 
 interface ICountriesListProps {
 	countries: ICountry[];

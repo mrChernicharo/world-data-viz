@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
-import { parseCountryName } from '../../lib/helpers/helperFns';
-import { ICountry } from '../../lib/interfaces/ICountry';
+import { parseCountryName } from '../../../lib/helpers/helperFns';
+import { ICountry } from '../../../lib/interfaces/ICountry';
 import { CountryCardContainer } from './CountryCardContainer';
 import { FaUser } from 'react-icons/fa';
 

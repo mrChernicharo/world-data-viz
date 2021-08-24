@@ -1,7 +1,22 @@
-export default function Hero() {
+import Image from 'next/image';
+import { HeroContainer } from './HeroContainer';
+interface IHeroProps {
+	isAppleM1: boolean;
+}
+
+export default function Hero({ isAppleM1 }: IHeroProps) {
+	const heroImg = 'img/hero.jpg';
 	return (
-		<div>
-			<h1>Hero</h1>
-		</div>
+		<HeroContainer>
+			<Image
+				src={heroImg}
+				width={800}
+				height={540}
+				alt={'greg-rakozy-unsplash'}
+				unoptimized={
+					process.env.NODE_ENV === 'development' && isAppleM1
+				}
+			/>
+		</HeroContainer>
 	);
 }

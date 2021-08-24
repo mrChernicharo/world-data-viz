@@ -1,7 +1,11 @@
 import { createContext, useEffect, useState } from 'react';
 import { Alpha2Code, Alpha3Code, ICountry } from '../lib/interfaces/ICountry';
 import axios from 'axios';
-import { IRegion, IRegionResponse } from '../lib/interfaces/IRegion';
+import {
+	IRegion,
+	IRegionResponse,
+	IRegionsInfo,
+} from '../lib/interfaces/IRegion';
 import { defaultCountry, defaultRegions } from '../lib/helpers/constants';
 
 interface ICountriesContextProps {
@@ -12,7 +16,9 @@ export const CountriesContext = createContext({
 	countries: [] as ICountry[],
 	selectedCountry: {} as ICountry,
 	regions: [] as IRegion[],
+	regionsInfo: {} as IRegionsInfo,
 	selectedRegion: {} as IRegion,
+	isAppleM1: false,
 	fetchCountries: () => {},
 	selectCountry: (code: Alpha2Code) => {},
 	fetchRegions: (code?: Alpha2Code, offset?: number) => {},
@@ -22,6 +28,7 @@ export const CountriesContext = createContext({
 export function CountriesContextProvider({ children }: ICountriesContextProps) {
 	const [countries, setCountries] = useState<ICountry[]>([]);
 	const [regions, setRegions] = useState<any[]>([]);
+	const [regionsInfo, setRegionsInfo] = useState({});
 	const [selectedCountry, setSelectedCountry] = useState({} as ICountry);
 	const [selectedRegion, setSelectedRegion] = useState({} as IRegion);
 
@@ -43,19 +50,28 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 			'x-rapidapi-host': 'wft-geo-db.p.rapidapi.com',
 			'x-rapidapi-key':
 				'1bf3597733msh05782a9f05f7575p18705bjsn541a5c8b37c8',
-			// '488f64ab30msh34d823c2ab79491p132cfbjsn71c7a72c6386',
-			// 'x-rapidapi-key': process.env.NEXT_PUBLIC_RAPID_API_KEY,
 		};
 
 		const url = `${baseUrl}/v1/geo/countries/${code}/regions?limit=${limit}&offset=${offset}`;
 
-		const req = await fetch(url, { headers });
+		try {
+			const req = await fetch(url, { headers });
+			if (!req.ok) {
+				throw new Error(req.statusText);
+			}
 
-		const response: IRegionResponse = await req.json();
+			const response: IRegionResponse = await req.json();
 
-		console.log(response.data, response.links, response.metadata);
+			setRegionsInfo({
+				links: response.links,
+				metadata: response.metadata,
+			});
 
-		setRegions(response.data);
+			setRegions(response.data);
+			//
+		} catch (err) {
+			console.warn(err);
+		}
 	}
 
 	function selectCountryHandler(code: Alpha2Code) {
@@ -70,8 +86,10 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 	const context = {
 		countries,
 		regions,
+		regionsInfo,
 		selectedCountry,
 		selectedRegion,
+		isAppleM1: process.arch === 'arm64' && process.platform === 'darwin', // bug fix pro M1,
 		selectCountry: selectCountryHandler,
 		fetchCountries: fetchCountriesHandler,
 		fetchRegions: fetchRegionsHandler,

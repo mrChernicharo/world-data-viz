@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
-import { CountriesContext } from '../../../../store/CountriesContext';
+import { CountriesContext } from '../../../../../store/CountriesContext';
 
 export default function CitiesPage() {
 	return (

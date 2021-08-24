@@ -16,3 +16,8 @@ export interface IRegionResponse {
 	links: IAPILink[];
 	metadata: { currentOffset: number; totalCount: number };
 }
+
+export interface IRegionsInfo {
+	links: IAPILink[];
+	metadata: { currentOffset: number; totalCount: number };
+}
