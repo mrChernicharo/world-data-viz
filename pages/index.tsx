@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 export default function Home() {
 	return (
 		<div>
@@ -5,3 +7,16 @@ export default function Home() {
 		</div>
 	);
 }
+
+// useEffect(() => {
+// 	async function fetchCities() {
+// 		// https://wft-geo-db.p.rapidapi.com
+// 		const req = await fetch(
+// 			'http://geodb-free-service.wirefreethought.com'
+// 		);
+
+// 		const cities = await req.json();
+
+// 		console.log(cities);
+// 	}
+// });

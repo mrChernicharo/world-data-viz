@@ -22,7 +22,7 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 	const [countries, setCountries] = useState<ICountry[]>([]);
 	const [selectedCountry, setSelectedCountry] = useState<ICountry | null>(
 		null
-	);
+	) as any;
 
 	async function fetchCountriesHandler() {
 		const req = await fetch('https://restcountries.eu/rest/v2/all');
@@ -33,18 +33,18 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 	}
 
 	function selectCountryHandler(code: Alpha3Code) {
+		if (!countries) return;
+
 		const selected = countries.find(c => c.alpha3Code === code) as ICountry;
 
-		if (selected) {
-			setSelectedCountry(selected);
-		} else {
-			throw new Error(`country ${code} not found!`);
-		}
+		if (!selected) return;
+
+		setSelectedCountry(selected);
 	}
 
 	const context = {
 		countries,
-		selectedCountry: null,
+		selectedCountry,
 		selectCountry: selectCountryHandler,
 		fetchCountries: fetchCountriesHandler,
 	};
@@ -52,6 +52,10 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 	useEffect(() => {
 		fetchCountriesHandler();
 	}, []);
+
+	useEffect(() => {
+		console.log(selectedCountry);
+	}, [selectedCountry]);
 
 	return (
 		<CountriesContext.Provider value={context}>
