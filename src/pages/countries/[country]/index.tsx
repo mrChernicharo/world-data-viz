@@ -1,17 +1,30 @@
 import { useRouter } from 'next/router';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { CountriesContext } from '../../../store/CountriesContext';
 import { nanoid } from 'nanoid';
 import { toArray } from '../../../lib/helpers/helperFns';
 import { FaUser } from 'react-icons/fa';
+import { Alpha2Code } from '../../../lib/interfaces/ICountry';
 
 export default function CountryPage() {
 	const router = useRouter();
-	const { selectedCountry } = useContext(CountriesContext);
+	const { selectedCountry, regions, fetchRegions, selectCountry } =
+		useContext(CountriesContext);
+
+	const getRegions = useCallback(
+		() => fetchRegions(selectedCountry.alpha2Code),
+		[fetchRegions, selectedCountry]
+	);
 
 	useEffect(() => {
-		// pegar cidades do país
-		// pegar regiões do país
+		if (!selectedCountry) {
+			const countryCode = router.query.country;
+			selectCountry(countryCode as Alpha2Code);
+		}
+	}, []);
+
+	useEffect(() => {
+		getRegions();
 	}, []);
 
 	return (
@@ -22,17 +35,23 @@ export default function CountryPage() {
 					<p>{selectedCountry.name}</p>
 
 					<ul>
-						{Object.values(selectedCountry.translations).map(
-							trans => (
-								<li key={nanoid()}>{trans}</li>
-							)
-						)}
+						{selectedCountry.translations &&
+							Object.values(selectedCountry.translations).map(
+								trans => <li key={nanoid()}>{trans}</li>
+							)}
 					</ul>
 
 					<p>
 						<FaUser />
 						{selectedCountry.population}
 					</p>
+
+					<ul>
+						{regions &&
+							regions.map(region => (
+								<li key={region.wikiDataId}> {region.name}</li>
+							))}
+					</ul>
 				</li>
 			</ul>
 		</div>

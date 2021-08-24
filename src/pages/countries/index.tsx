@@ -12,11 +12,11 @@ export default function CountriesPage() {
 
 	// console.log(router.replace());
 	function navigateToCountry(country: ICountry) {
-		const path = `/countries/${country.name}`;
+		const path = `/countries/${country.alpha2Code}`;
 
 		router.push(path);
 
-		context.selectCountry(country);
+		context.selectCountry(country.alpha2Code);
 	}
 
 	return (
