@@ -6,6 +6,7 @@ export const CountryCardContainer = styled.div`
 	max-width: 12rem;
 
 	&:hover {
+		cursor: pointer;
 		background: var(--color-primary-100);
 	}
 `;

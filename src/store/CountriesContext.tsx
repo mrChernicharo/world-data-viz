@@ -21,7 +21,7 @@ export const CountriesContext = createContext({
 	isAppleM1: false,
 	fetchCountries: () => {},
 	selectCountry: (code: Alpha2Code) => {},
-	fetchRegions: (code?: Alpha2Code, offset?: number) => {},
+	fetchRegions: (code?: Alpha2Code, offset?: number) => Promise,
 	selectRegion: (country: ICountry) => {},
 });
 
@@ -54,8 +54,9 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 
 		const url = `${baseUrl}/v1/geo/countries/${code}/regions?limit=${limit}&offset=${offset}`;
 
+		const req = await fetch(url, { headers });
+
 		try {
-			const req = await fetch(url, { headers });
 			if (!req.ok) {
 				throw new Error(req.statusText);
 			}
@@ -71,6 +72,8 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 			//
 		} catch (err) {
 			console.warn(err);
+		} finally {
+			return req.status;
 		}
 	}
 
