@@ -6,7 +6,13 @@ import {
 	IRegionResponse,
 	IRegionsInfo,
 } from '../lib/interfaces/IRegion';
-import { defaultCountry, defaultRegions } from '../lib/helpers/constants';
+import {
+	defaultCities,
+	defaultCountry,
+	defaultRegions,
+	geoDBHeaders,
+} from '../lib/helpers/constants';
+import { ICitiesInfo, ICity, ICityResponse } from '../lib/interfaces/ICity';
 
 interface ICountriesContextProps {
 	children: JSX.Element[] | JSX.Element;
@@ -18,19 +24,26 @@ export const CountriesContext = createContext({
 	regions: [] as IRegion[],
 	regionsInfo: {} as IRegionsInfo,
 	selectedRegion: {} as IRegion,
+	cities: [] as ICity[],
+	citiesInfo: {} as ICitiesInfo,
+	selectedCity: {} as ICity,
 	isAppleM1: false,
 	fetchCountries: () => {},
 	selectCountry: (code: Alpha2Code) => {},
 	fetchRegions: (code?: Alpha2Code, offset?: number) => Promise,
-	selectRegion: (country: ICountry) => {},
+	selectRegion: (region: IRegion) => {},
+	fetchCities: (regionCode: string, offset?: number) => {},
 });
 
 export function CountriesContextProvider({ children }: ICountriesContextProps) {
 	const [countries, setCountries] = useState<ICountry[]>([]);
 	const [regions, setRegions] = useState<any[]>([]);
+	const [cities, setCities] = useState<any[]>([]);
 	const [regionsInfo, setRegionsInfo] = useState({});
+	const [citiesInfo, setCitiesInfo] = useState({});
 	const [selectedCountry, setSelectedCountry] = useState({} as ICountry);
 	const [selectedRegion, setSelectedRegion] = useState({} as IRegion);
+	const [selectedCity, setSelectedCity] = useState({} as ICity);
 
 	async function fetchCountriesHandler() {
 		const req = await fetch('https://restcountries.eu/rest/v2/all');
@@ -45,16 +58,10 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 	async function fetchRegionsHandler(code: Alpha2Code = 'US', offset = 0) {
 		const limit = 10;
 		const baseUrl = 'https://wft-geo-db.p.rapidapi.com';
-		const headers = {
-			'Access-Control-Allow-Origin': '*',
-			'x-rapidapi-host': 'wft-geo-db.p.rapidapi.com',
-			'x-rapidapi-key':
-				'1bf3597733msh05782a9f05f7575p18705bjsn541a5c8b37c8',
-		};
 
 		const url = `${baseUrl}/v1/geo/countries/${code}/regions?limit=${limit}&offset=${offset}`;
 
-		const req = await fetch(url, { headers });
+		const req = await fetch(url, { headers: geoDBHeaders });
 
 		try {
 			if (!req.ok) {
@@ -77,26 +84,64 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 		}
 	}
 
+	async function fetchCitiesHandler(regionCode: string, offset = 0) {
+		const limit = 10;
+		const baseUrl = 'https://wft-geo-db.p.rapidapi.com';
+
+		const url = `${baseUrl}/v1/geo/countries/${selectedCountry.alpha2Code}/regions/${regionCode}/cities?limit=${limit}&offset=${offset}&sort=-population,name`;
+
+		const req = await fetch(url, { headers: geoDBHeaders });
+
+		try {
+			if (!req.ok) {
+				throw new Error(req.statusText);
+			}
+
+			const response: ICityResponse = await req.json();
+
+			console.log(response);
+			setCitiesInfo({
+				links: response.links,
+				metadata: response.metadata,
+			});
+
+			setCities(response.data);
+			//
+		} catch (err) {
+			console.warn(err);
+		} finally {
+			return req.status;
+		}
+	}
+
 	function selectCountryHandler(code: Alpha2Code) {
 		const country = countries.find(c => c.alpha2Code === code) as ICountry;
 		setSelectedCountry(country);
 	}
 
-	function selectRegionHandler(region: any) {
+	function selectRegionHandler(region: IRegion) {
 		setSelectedRegion(region);
+	}
+
+	function selectCityHandler(city: ICity) {
+		setSelectedCity(city);
 	}
 
 	const context = {
 		countries,
 		regions,
 		regionsInfo,
+		cities,
+		citiesInfo,
 		selectedCountry,
 		selectedRegion,
+		selectedCity,
 		isAppleM1: process.arch === 'arm64' && process.platform === 'darwin', // bug fix pro M1,
 		selectCountry: selectCountryHandler,
 		fetchCountries: fetchCountriesHandler,
 		fetchRegions: fetchRegionsHandler,
 		selectRegion: selectRegionHandler,
+		fetchCities: fetchCitiesHandler,
 	};
 
 	useEffect(() => {
@@ -109,6 +154,10 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 
 	useEffect(() => {
 		setRegions(defaultRegions);
+	}, []);
+
+	useEffect(() => {
+		setCities(defaultCities);
 	}, []);
 
 	// useEffect(() => {

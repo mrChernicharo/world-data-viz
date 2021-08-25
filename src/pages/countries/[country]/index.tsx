@@ -34,9 +34,11 @@ export default function CountryPage() {
 	const {
 		selectedCountry,
 		regions,
+		selectedRegion,
 		regionsInfo,
 		fetchRegions,
 		selectCountry,
+		selectRegion,
 	} = useContext(CountriesContext);
 
 	const getRegions = useCallback(
@@ -47,7 +49,7 @@ export default function CountryPage() {
 	);
 
 	const getMaxOffset = useCallback(() => {
-		return regionsInfo.metadata.totalCount - 10;
+		return regionsInfo?.metadata?.totalCount - 10 || 0;
 	}, [regionsInfo?.metadata?.totalCount]);
 
 	function handleOffsetIncrement(e: SyntheticEvent) {
@@ -65,7 +67,9 @@ export default function CountryPage() {
 	}
 
 	function handleNavigateToRegion(region: IRegion) {
-		const path = router.pathname;
+		selectRegion(region);
+		const path = router.asPath;
+		console.log(router);
 
 		router.push(`${path}/${region.name}`);
 	}
@@ -110,7 +114,7 @@ export default function CountryPage() {
 		<div>
 			<h3>Country info</h3>
 
-			<p>{selectedCountry.name}</p>
+			<h1>{selectedCountry.name}</h1>
 
 			{selectedCountry.flag && (
 				<Image
