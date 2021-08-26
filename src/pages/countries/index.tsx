@@ -15,7 +15,6 @@ export default function CountriesPage() {
 	const [filteredCountries, setFilteredCountries] = useState(
 		context.countries
 	);
-	const countrySearchRef = useRef('');
 
 	function navigateToCountry(country: ICountry) {
 		const path = `/countries/${country.alpha2Code}`;
@@ -27,6 +26,9 @@ export default function CountriesPage() {
 
 	function handleInputChange(e: SyntheticEvent) {
 		const inputVal = (e.target as any).value as string;
+
+		if (!inputVal) return;
+
 		// console.log(e, inputVal);
 		let filter = context.countries.filter(c =>
 			[
@@ -38,7 +40,7 @@ export default function CountriesPage() {
 			].includes(inputVal.toLowerCase())
 		);
 
-		if (!inputVal || !filter.length) {
+		if (!filter.length) {
 			filter = context.countries;
 		}
 		setFilteredCountries(filter);

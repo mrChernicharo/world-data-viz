@@ -68,6 +68,7 @@ export default function CountryPage() {
 
 	function handleNavigateToRegion(region: IRegion) {
 		selectRegion(region);
+
 		const path = router.asPath;
 		console.log(router);
 

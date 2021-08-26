@@ -13,6 +13,8 @@ import {
 	geoDBHeaders,
 } from '../lib/helpers/constants';
 import { ICitiesInfo, ICity, ICityResponse } from '../lib/interfaces/ICity';
+import { useInterval } from '../lib/hooks/useInterval';
+import { useCallback } from 'react';
 
 interface ICountriesContextProps {
 	children: JSX.Element[] | JSX.Element;
@@ -33,6 +35,7 @@ export const CountriesContext = createContext({
 	fetchRegions: (code?: Alpha2Code, offset?: number) => Promise,
 	selectRegion: (region: IRegion) => {},
 	fetchCities: (regionCode: string, offset?: number) => {},
+	selectCity: (city: ICity) => {},
 });
 
 export function CountriesContextProvider({ children }: ICountriesContextProps) {
@@ -44,6 +47,24 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 	const [selectedCountry, setSelectedCountry] = useState({} as ICountry);
 	const [selectedRegion, setSelectedRegion] = useState({} as IRegion);
 	const [selectedCity, setSelectedCity] = useState({} as ICity);
+
+	const context = {
+		countries,
+		regions,
+		regionsInfo,
+		cities,
+		citiesInfo,
+		selectedCountry,
+		selectedRegion,
+		selectedCity,
+		isAppleM1: process.arch === 'arm64' && process.platform === 'darwin', // bug fix pro M1,
+		selectCountry: selectCountryHandler,
+		fetchCountries: fetchCountriesHandler,
+		fetchRegions: fetchRegionsHandler,
+		selectRegion: selectRegionHandler,
+		fetchCities: fetchCitiesHandler,
+		selectCity: selectCityHandler,
+	};
 
 	async function fetchCountriesHandler() {
 		const req = await fetch('https://restcountries.eu/rest/v2/all');
@@ -127,37 +148,82 @@ export function CountriesContextProvider({ children }: ICountriesContextProps) {
 		setSelectedCity(city);
 	}
 
-	const context = {
-		countries,
-		regions,
-		regionsInfo,
-		cities,
-		citiesInfo,
-		selectedCountry,
-		selectedRegion,
-		selectedCity,
-		isAppleM1: process.arch === 'arm64' && process.platform === 'darwin', // bug fix pro M1,
-		selectCountry: selectCountryHandler,
-		fetchCountries: fetchCountriesHandler,
-		fetchRegions: fetchRegionsHandler,
-		selectRegion: selectRegionHandler,
-		fetchCities: fetchCitiesHandler,
-	};
+	function storeContext(contextData: any) {
+		window.localStorage.setItem('context', JSON.stringify(contextData));
+	}
+
+	function hydrateContext() {
+		try {
+			const contextRaw = window.localStorage.getItem('context') as string;
+			const contextData = JSON.parse(contextRaw);
+			const {
+				selectedCity,
+				selectedRegion,
+				selectedCountry,
+				cities,
+				citiesInfo,
+				regions,
+				regionsInfo,
+			} = contextData;
+			selectCityHandler(selectedCity);
+			selectRegionHandler(selectedRegion);
+			selectCountryHandler(selectedCountry.alpha2Code);
+			setRegions(regions);
+			setCities(cities);
+			setRegionsInfo(regionsInfo);
+			setCitiesInfo(citiesInfo);
+		} catch (err) {
+			console.warn(err);
+		} finally {
+			console.log('hydrated store');
+		}
+	}
+
+	const storeCb = useCallback(() => {
+		const {
+			selectedCity,
+			selectedRegion,
+			selectedCountry,
+			cities,
+			citiesInfo,
+			regions,
+			regionsInfo,
+		} = context;
+
+		storeContext({
+			selectedCity,
+			selectedRegion,
+			selectedCountry,
+			cities,
+			citiesInfo,
+			regions,
+			regionsInfo,
+		});
+	}, [context]);
+
+	useInterval(storeCb, 8000);
+
+	useEffect(() => {}, []);
+
+	useEffect(() => {
+		if (window) {
+			hydrateContext();
+		} else {
+			setSelectedCountry(defaultCountry);
+			setRegions(defaultRegions);
+			setCities(defaultCities);
+			setRegionsInfo(regionsInfo);
+			setCitiesInfo(citiesInfo);
+			// selectRegionHandler(defaultRegions[0]);
+			// selectCityHandler(defaultCities[0]);
+		}
+	}, []);
+
+	useEffect(() => {}, []);
 
 	useEffect(() => {
 		fetchCountriesHandler();
-	}, []);
-
-	useEffect(() => {
-		setSelectedCountry(defaultCountry);
-	}, []);
-
-	useEffect(() => {
-		setRegions(defaultRegions);
-	}, []);
-
-	useEffect(() => {
-		setCities(defaultCities);
+		fetchRegionsHandler();
 	}, []);
 
 	// useEffect(() => {

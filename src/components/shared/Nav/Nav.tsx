@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { FiGlobe } from 'react-icons/fi';
 import { NavContainer } from './NavContainer';
@@ -6,7 +7,12 @@ import { NavLinks } from './NavLinks/NavLinks';
 
 export default function Nav() {
 	const router = useRouter();
-	const location = router.pathname;
+	const [location, setLocation] = useState('/');
+
+	useEffect(() => {
+		setLocation(router.asPath);
+		console.log(router.asPath);
+	}, [router.asPath]);
 
 	return (
 		<NavContainer>

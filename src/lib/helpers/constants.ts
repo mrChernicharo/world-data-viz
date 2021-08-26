@@ -1,6 +1,6 @@
-import { ICity } from '../interfaces/ICity';
+import { ICitiesInfo, ICity } from '../interfaces/ICity';
 import { ICountry } from '../interfaces/ICountry';
-import { IRegion } from '../interfaces/IRegion';
+import { IRegion, IRegionsInfo } from '../interfaces/IRegion';
 
 export const geoDBHeaders = {
 	// 'Access-Control-Allow-Origin': '*',
@@ -251,3 +251,75 @@ export const defaultCities: ICity[] = [
 		wikiDataId: 'Q7138122',
 	},
 ];
+
+export const defaultRegion: IRegion = {
+	countryCode: 'US',
+	fipsCode: '11',
+	isoCode: 'DC',
+	name: 'District of Columbia',
+	wikiDataId: 'Q3551781',
+};
+
+export const defaultCity: ICity = {
+	city: 'Washington, D.C.',
+	id: 113920,
+	latitude: 38.89511,
+	longitude: -77.03637,
+	name: 'Washington, D.C.',
+	population: 705749,
+	type: 'CITY',
+	wikiDataId: 'Q61',
+};
+
+export const defaultRegionInfo: IRegionsInfo = {
+	links: [
+		{
+			rel: 'first',
+			href: '/v1/geo/countries/US/regions?offset=0&limit=10',
+		},
+		{
+			rel: 'next',
+			href: '/v1/geo/countries/US/regions?offset=10&limit=10',
+		},
+		{
+			rel: 'last',
+			href: '/v1/geo/countries/US/regions?offset=50&limit=10',
+		},
+	],
+	metadata: { currentOffset: 0, totalCount: 56 },
+};
+
+export const defaultCitiesInfo: ICitiesInfo = {
+	links: [
+		{
+			rel: 'first',
+			href: '/v1/geo/countries/US/regions/DC/cities?offset=0&limit=10&sort=-population,name',
+		},
+		{
+			rel: 'next',
+			href: '/v1/geo/countries/US/regions/DC/cities?offset=10&limit=10&sort=-population,name',
+		},
+		{
+			rel: 'last',
+			href: '/v1/geo/countries/US/regions/DC/cities?offset=90&limit=10&sort=-population,name',
+		},
+	],
+	metadata: { currentOffset: 0, totalCount: 95 },
+};
+
+export const regionsPath = (isoCode: string) =>
+	`/countries/${isoCode || defaultRegion.isoCode}`;
+
+export const citiesPath = (regionIsoCode: string, cityName: string) => {
+	const regionCode = regionIsoCode || defaultRegion.isoCode;
+	const city = cityName || defaultCity.name;
+
+	return `/countries/${regionCode}/${city}`;
+};
+
+export const cityPath = (regionIsoCode: string, cityName: string) => {
+	const regionCode = regionIsoCode || defaultRegion.isoCode;
+	const city = cityName || defaultCity.name;
+
+	return `/countries/${regionCode}/cities/${city}`;
+};

@@ -9,6 +9,9 @@ import {
 	FaUser,
 	FaUserAlt,
 } from 'react-icons/fa';
+import CitiesList from '../../../../components/cities/CitiesList/CitiesList';
+import { citiesPath, cityPath } from '../../../../lib/helpers/constants';
+import { ICity } from '../../../../lib/interfaces/ICity';
 import { CountriesContext } from '../../../../store/CountriesContext';
 
 const tOpts = {
@@ -22,12 +25,18 @@ export default function RegionPage() {
 	const [disablePrev, setDisablePrev] = useState(true);
 
 	const router = useRouter();
-	const { selectedRegion, cities, citiesInfo, fetchCities } =
+	const { selectedRegion, cities, citiesInfo, fetchCities, selectCity } =
 		useContext(CountriesContext);
 
 	const getMaxOffset = useCallback(() => {
+		console.log(citiesInfo);
 		return citiesInfo?.metadata?.totalCount - 10 || 0;
 	}, [citiesInfo?.metadata?.totalCount]);
+
+	function handleCitySelected(city: ICity) {
+		selectCity(city);
+		router.push(cityPath(selectedRegion.isoCode, city.name));
+	}
 
 	function handleOffsetIncrement(e: SyntheticEvent) {
 		const maxOffset = getMaxOffset();
@@ -84,9 +93,9 @@ export default function RegionPage() {
 
 	return (
 		<div>
-			<h1>{router.query.region}</h1>
+			<h1>{selectedRegion.name || router.query.region}</h1>
 
-			<ul>
+			{/* <ul>
 				{cities.map(city => (
 					<li key={nanoid()}>
 						<span>{city.name}</span>
@@ -94,7 +103,13 @@ export default function RegionPage() {
 						<span>{city.population}</span>
 					</li>
 				))}
-			</ul>
+			</ul> */}
+
+			<CitiesList
+				cities={cities}
+				onSelectCity={handleCitySelected}
+				key={nanoid()}
+			/>
 
 			{!disablePrev && (
 				<button onClick={throttle(handleOffsetDecrement, 500, tOpts)}>
